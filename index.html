@@ -125,15 +125,15 @@
     <input type="range" id="split" min="0" max="100" step="1" value="50" aria-label="Fee payment split, from fully upfront to no sale no fee">
 
     <div class="ends">
-      <div><b>Fully upfront</b>0.85% · pay it all now</div>
-      <div><b>No sale, no fee</b>1.25% · pay it all on completion</div>
+      <div><b>Fully upfront</b>0.85% · pay it all now · min fee £2,800 + VAT</div>
+      <div><b>No sale, no fee</b>1.25% · pay it all on completion · min fee £4,000 + VAT</div>
     </div>
   </section>
 
   <section class="panel">
     <div class="panelhead">
       <h2 id="tier">Part prepaid</h2>
-      <span>Split between upfront and completion</span>
+      <span id="tiersub">Split between upfront and completion</span>
     </div>
 
     <div class="row"><span class="lbl">Marketing fee <small>(inc VAT)</small></span><span class="val" id="upfront">£0</span></div>
@@ -163,42 +163,62 @@
 
 <script>
 (function () {
-  var RATE_MIN = 0.0085, RATE_MAX = 0.0125, VAT = 0.2, MIN_FEE = 3500, MIN_UPFRONT_INC_VAT = 395;
+  var RATE_MIN = 0.0085, RATE_MAX = 0.0125, VAT = 0.2;
+  // Standard (part-prepaid) minimum fee. Fully prepaid discounts this; no sale, no fee raises it.
+  var MIN_FEE = 3500, MIN_FEE_FULL_PREPAID = 2800, MIN_FEE_NSNF = 4000;
+  // The marketing/upfront fee on the part-prepaid scale never falls below this (inc VAT), however high the slider goes.
+  var MIN_UPFRONT_INC_VAT = 395;
   var priceEl = document.getElementById('price'), splitEl = document.getElementById('split');
   var price = 600000;
   function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
 
   function render() {
     var p = Number(splitEl.value) / 100;
-    var raw = price * (RATE_MIN + p * (RATE_MAX - RATE_MIN));
-    var total = Math.max(raw, MIN_FEE);
-    var savings = Math.max(price * RATE_MAX, MIN_FEE) - total;
-    var effective = price > 0 ? (total / price) * 100 : 0;
     var noPrice = !(price > 0);
-    var alwaysMin = !noPrice && price * RATE_MAX <= MIN_FEE;
-    var atMin = !noPrice && (alwaysMin || raw < MIN_FEE);
+    var fullPrepaid = !noPrice && p === 0;
+    var noSaleNoFee = !noPrice && p === 1;
+    var minFee = fullPrepaid ? MIN_FEE_FULL_PREPAID : noSaleNoFee ? MIN_FEE_NSNF : MIN_FEE;
+    var raw = price * (RATE_MIN + p * (RATE_MAX - RATE_MIN));
+    var total = Math.max(raw, minFee);
+    var atMin = !noPrice && raw < minFee;
+    var savings = Math.max(price * RATE_MAX, MIN_FEE_NSNF) - total;
+    var effective = price > 0 ? (total / price) * 100 : 0;
     var totalIncVat = total * (1 + VAT);
-    var upfrontIncVat = atMin ? MIN_UPFRONT_INC_VAT : (total * (1 - p)) * (1 + VAT);
+    var proportionalUpfrontIncVat = (total * (1 - p)) * (1 + VAT);
+    var upfrontIncVat = fullPrepaid ? totalIncVat
+      : noSaleNoFee ? 0
+      : Math.max(MIN_UPFRONT_INC_VAT, proportionalUpfrontIncVat);
     var completionIncVat = totalIncVat - upfrontIncVat;
-    var tier = noPrice ? 'Awaiting price' : atMin ? 'Minimum fee' : p <= 0.02 ? 'Full prepaid' : p >= 0.98 ? 'No sale, no fee' : 'Part prepaid';
-    var rateText = noPrice ? 'Enter a marketing price' : atMin ? 'Minimum fee — £3,500 + VAT' : effective.toFixed(2) + '% + VAT';
+    var tier = noPrice ? 'Awaiting price' : fullPrepaid ? 'Full prepaid' : noSaleNoFee ? 'No sale, no fee' : 'Part prepaid';
+    var tierSub = noPrice ? '' : fullPrepaid ? 'Paid in full now' : noSaleNoFee ? 'Nothing paid until completion' : 'Split between upfront and completion';
+    var rateText = noPrice ? 'Enter a marketing price' : atMin ? 'Minimum fee — £' + minFee.toLocaleString('en-GB') + ' + VAT' : effective.toFixed(2) + '% + VAT';
 
     document.getElementById('tag').textContent = tier;
     document.getElementById('tier').textContent = tier;
+    document.getElementById('tiersub').textContent = tierSub;
     document.getElementById('rate').textContent = rateText;
     document.getElementById('rate2').textContent = rateText;
     document.getElementById('upfront').textContent = noPrice ? '—' : fmt(upfrontIncVat);
     document.getElementById('completion').textContent = noPrice ? '—' : fmt(completionIncVat);
     document.getElementById('total').textContent = noPrice ? '—' : fmt(totalIncVat);
-    document.getElementById('minfee').hidden = !atMin;
+
+    var minfeeEl = document.getElementById('minfee');
+    minfeeEl.hidden = !atMin;
+    if (atMin) {
+      minfeeEl.textContent = fullPrepaid
+        ? 'Paying the whole fee upfront reduces our minimum fee to £2,800 + VAT.'
+        : noSaleNoFee
+          ? 'Our minimum fee for a no sale, no fee arrangement is £4,000 + VAT.'
+          : 'Our minimum fee of £3,500 + VAT applies at this marketing price: ' + fmt(upfrontIncVat) + ' upfront, the balance on completion.';
+    }
 
     var sv = document.getElementById('savings');
     sv.hidden = noPrice || atMin || !(savings > 1);
     sv.textContent = 'Saves ' + fmt(savings * (1 + VAT)) + ' (inc VAT) vs no sale, no fee';
 
-    splitEl.disabled = noPrice || alwaysMin;
-    splitEl.style.opacity = (noPrice || alwaysMin) ? '0.4' : '1';
-    splitEl.style.cursor = (noPrice || alwaysMin) ? 'default' : 'pointer';
+    splitEl.disabled = noPrice;
+    splitEl.style.opacity = noPrice ? '0.4' : '1';
+    splitEl.style.cursor = noPrice ? 'default' : 'pointer';
     splitEl.style.background = 'linear-gradient(to right,#F2B92B 0%,#F2B92B ' + splitEl.value + '%,#DFDEE8 ' + splitEl.value + '%,#DFDEE8 100%)';
   }
 
