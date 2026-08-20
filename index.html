@@ -143,7 +143,8 @@
       <div class="lbl">Total fee <small>(inc VAT)</small></div>
       <div>
         <div class="fig" id="total">£0</div>
-        <div class="sub" id="rate2">1.03% + VAT</div>
+        <div class="sub">Including VAT</div>
+        <div class="sub" id="rateeqv" hidden>(eqv of 0.80% + VAT)</div>
       </div>
     </div>
 
@@ -193,13 +194,16 @@
     var completionIncVat = totalIncVat - upfrontIncVat;
     var tier = noPrice ? 'Awaiting price' : fullPrepaid ? 'Full prepaid' : noSaleNoFee ? 'No sale, no fee' : 'Part prepaid';
     var tierSub = noPrice ? '' : fullPrepaid ? 'Paid in full now' : noSaleNoFee ? 'Nothing paid until completion' : 'Split between upfront and completion';
-    var rateText = noPrice ? 'Enter a marketing price' : atMin ? 'Minimum fee — £' + minFee.toLocaleString('en-GB') + ' + VAT' : effective.toFixed(2) + '% + VAT';
+    var pctText = effective.toFixed(2) + '% + VAT';
+    var rateText = noPrice ? 'Enter a marketing price' : atMin ? 'Minimum fee — £' + minFee.toLocaleString('en-GB') + ' + VAT' : pctText;
 
     document.getElementById('tag').textContent = tier;
     document.getElementById('tier').textContent = tier;
     document.getElementById('tiersub').textContent = tierSub;
     document.getElementById('rate').textContent = rateText;
-    document.getElementById('rate2').textContent = rateText;
+    var rateEqvEl = document.getElementById('rateeqv');
+    rateEqvEl.hidden = noPrice || atMin;
+    rateEqvEl.textContent = '(eqv of ' + pctText + ')';
     document.getElementById('upfront').textContent = noPrice ? '—' : fmt(upfrontIncVat);
     document.getElementById('completion').textContent = noPrice ? '—' : fmt(completionIncVat);
     document.getElementById('total').textContent = noPrice ? '—' : fmt(totalIncVat);
