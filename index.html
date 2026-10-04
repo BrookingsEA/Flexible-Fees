@@ -139,7 +139,7 @@
 
     <label class="nsnf">
       <input type="checkbox" id="nsnf">
-      <span><b>No sale, no fee</b> — nothing paid until completion <small>1.5% + VAT, minimum fee £4,000 + VAT</small></span>
+      <span><b>No sale, no fee</b> — nothing paid until completion <small>1.5% + VAT, minimum fee £4,200 + VAT</small></span>
     </label>
   </section>
 
@@ -179,8 +179,8 @@
   // Fully prepaid is a fixed 0.8% (our minimum rate) - exactly 20% below the part-prepaid floor of 1%.
   // Part prepaid tops out at 1.25%; no sale, no fee is a separate, higher rate since it carries more risk for us.
   var RATE_FULL_PREPAID = 0.008, RATE_PART_MIN = 0.01, RATE_PART_MAX = 0.0125, RATE_NSNF = 0.015, VAT = 0.2;
-  // Standard (part-prepaid) minimum fee. Fully prepaid discounts this; no sale, no fee raises it.
-  var MIN_FEE = 3500, MIN_FEE_FULL_PREPAID = 2800, MIN_FEE_NSNF = 4000;
+  // Standard (part-prepaid) minimum fee of £3,500 + VAT. Fully prepaid is 20% lower (£2,800); no sale, no fee is 20% higher (£4,200).
+  var MIN_FEE = 3500, MIN_FEE_FULL_PREPAID = 2800, MIN_FEE_NSNF = 4200;
   // The marketing/upfront fee on the part-prepaid scale never falls below this (inc VAT) - it lands here exactly at the slider's far right, where rate reaches RATE_PART_MAX and nothing remains to split proportionally.
   var MIN_UPFRONT_INC_VAT = 395;
   var priceEl = document.getElementById('price'), splitEl = document.getElementById('split'), nsnfEl = document.getElementById('nsnf');
@@ -233,7 +233,7 @@
     minfeeEl.hidden = !atMin;
     if (atMin) {
       minfeeEl.textContent = nsnfMode
-        ? 'Our minimum fee for a no sale, no fee arrangement is £4,000 + VAT.'
+        ? 'Our minimum fee for a no sale, no fee arrangement is £4,200 + VAT.'
         : fullPrepaid
           ? 'Paying the whole fee upfront reduces our minimum fee to £2,800 + VAT.'
           : 'Our minimum fee of £3,500 + VAT applies at this marketing price: ' + fmt(upfrontIncVat) + ' upfront, the balance on completion.';
