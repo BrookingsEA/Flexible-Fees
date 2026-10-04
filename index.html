@@ -179,35 +179,17 @@
   var RATE_FULL_PREPAID = 0.008, RATE_PART_MIN = 0.009, RATE_PART_MAX = 0.0125, RATE_NSNF = 0.015, VAT = 0.2;
   // Standard (part-prepaid) minimum fee. Fully prepaid discounts this; no sale, no fee raises it.
   var MIN_FEE = 3500, MIN_FEE_FULL_PREPAID = 2800, MIN_FEE_NSNF = 4000;
-  // The marketing/upfront fee on the part-prepaid scale never falls below this (inc VAT) - the slider stops exactly here.
+  // The marketing/upfront fee on the part-prepaid scale never falls below this (inc VAT) - it lands here exactly at the slider's far right, where rate reaches RATE_PART_MAX and nothing remains to split proportionally.
   var MIN_UPFRONT_INC_VAT = 395;
   var priceEl = document.getElementById('price'), splitEl = document.getElementById('split'), nsnfEl = document.getElementById('nsnf');
   var price = 600000;
   function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
 
-  function partPrepaidTotalExVat(price, p) {
-    var rate = RATE_PART_MIN + p * (RATE_PART_MAX - RATE_PART_MIN);
-    return Math.max(price * rate, MIN_FEE);
-  }
-
-  // The furthest right the slider can go before the upfront marketing fee would drop below its £395 floor.
-  function findPMax(price) {
-    var lo = 0, hi = 1;
-    for (var i = 0; i < 40; i++) {
-      var mid = (lo + hi) / 2;
-      var upfrontAtMid = partPrepaidTotalExVat(price, mid) * (1 - mid) * (1 + VAT);
-      if (upfrontAtMid > MIN_UPFRONT_INC_VAT) { lo = mid; } else { hi = mid; }
-    }
-    return (lo + hi) / 2;
-  }
-
   function render() {
     var noPrice = !(price > 0);
     var nsnfMode = nsnfEl.checked;
-    var s = Number(splitEl.value) / 100;
-    var pMax = noPrice ? 1 : findPMax(price);
-    var fullPrepaid = !noPrice && !nsnfMode && s === 0;
-    var p = fullPrepaid ? 0 : s * pMax;
+    var p = Number(splitEl.value) / 100;
+    var fullPrepaid = !noPrice && !nsnfMode && p === 0;
 
     var minFee, rate, raw, total, upfrontIncVat;
     if (nsnfMode) {
