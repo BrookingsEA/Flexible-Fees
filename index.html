@@ -72,7 +72,7 @@
   .total .sub{font-size:13px;color:rgba(255,255,255,.82);text-align:right;font-variant-numeric:tabular-nums}
   .minfee{margin:16px 0 0;font-size:13px;color:var(--muted)}
   .savings[hidden]{display:none}
-  .savings{display:inline-block;margin:18px 0 0;background:var(--gold);color:var(--navy);font-size:14px;font-weight:700;padding:9px 14px}
+  .savings{display:block;margin:18px 0 0;background:var(--gold);color:var(--navy);font-size:16px;font-weight:700;padding:14px 16px;text-align:center}
   .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
   .btn{display:inline-block;border-radius:2px;padding:14px 22px;font-size:15px;font-weight:700;text-decoration:none;transition:background 140ms cubic-bezier(.4,0,.2,1)}
   .btn-gold{background:var(--gold);color:var(--navy)} .btn-gold:hover{background:var(--gold-600);color:var(--navy)}
@@ -130,6 +130,8 @@
 
     <input type="range" id="split" min="0" max="100" step="1" value="50" aria-label="Fee payment split, from fully upfront to part prepaid at minimum upfront payment">
 
+    <p class="savings" id="savings" hidden></p>
+
     <div class="ends">
       <div><b>Fully upfront</b>0.8% · pay it all now<br><span class="save20">20% saving</span></div>
       <div><b>Part prepaid</b>Minimum £395 marketing fee</div>
@@ -160,7 +162,6 @@
     </div>
 
     <p class="minfee" id="minfee" hidden>Our minimum fee of £3,500 + VAT applies at this marketing price: £395 (inc VAT) upfront, the balance on completion.</p>
-    <p class="savings" id="savings" hidden></p>
   </section>
 
   <p class="smallprint">Figures include VAT at 20%; the rate quoted is exclusive of VAT. Full terms are set out in the contract we send you once you've chosen your fee option.</p>
