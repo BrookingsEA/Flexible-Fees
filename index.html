@@ -131,7 +131,7 @@
     <input type="range" id="split" min="0" max="100" step="1" value="50" aria-label="Fee payment split, from fully upfront to part prepaid at minimum upfront payment">
 
     <div class="ends">
-      <div><b>Fully upfront</b>0.8% · pay it all now<br><span class="save20">20% cheaper</span></div>
+      <div><b>Fully upfront</b>0.8% · pay it all now<br><span class="save20">20% saving</span></div>
       <div><b>Part prepaid</b>£395 min. upfront · rest on completion</div>
     </div>
 
@@ -247,7 +247,7 @@
     splitEl.style.opacity = sliderDisabled ? '0.4' : '1';
     splitEl.style.cursor = sliderDisabled ? 'default' : 'pointer';
     // A thin blue marker at the very start of the track sets the Full Prepaid snap-point apart from the Part Prepaid scale that follows it.
-    var fullPrepaidMark = 3;
+    var fullPrepaidMark = 6;
     var goldEnd = Math.max(Number(splitEl.value), fullPrepaidMark);
     splitEl.style.background = 'linear-gradient(to right,#3C9ACC 0%,#3C9ACC ' + fullPrepaidMark + '%,#F2B92B ' + fullPrepaidMark + '%,#F2B92B ' + goldEnd + '%,#DFDEE8 ' + goldEnd + '%,#DFDEE8 100%)';
   }
