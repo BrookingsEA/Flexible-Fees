@@ -131,7 +131,7 @@
     <input type="range" id="split" min="0" max="100" step="1" value="50" aria-label="Fee payment split, from fully upfront to part prepaid at minimum upfront payment">
 
     <div class="ends">
-      <div><b>Fully upfront</b>0.8% · pay it all now<br><span class="save20">20% cheaper than Part Prepaid's 0.96% start rate</span></div>
+      <div><b>Fully upfront</b>0.8% · pay it all now<br><span class="save20">20% cheaper</span></div>
       <div><b>Part prepaid</b>£395 min. upfront · rest on completion</div>
     </div>
 
@@ -175,9 +175,9 @@
 
 <script>
 (function () {
-  // Fully prepaid is a fixed 0.8% (our minimum rate); the part-prepaid scale starts higher, at 0.96%.
+  // Fully prepaid is a fixed 0.8% (our minimum rate) - exactly 20% below the part-prepaid floor of 1%.
   // Part prepaid tops out at 1.25%; no sale, no fee is a separate, higher rate since it carries more risk for us.
-  var RATE_FULL_PREPAID = 0.008, RATE_PART_MIN = 0.0096, RATE_PART_MAX = 0.0125, RATE_NSNF = 0.015, VAT = 0.2;
+  var RATE_FULL_PREPAID = 0.008, RATE_PART_MIN = 0.01, RATE_PART_MAX = 0.0125, RATE_NSNF = 0.015, VAT = 0.2;
   // Standard (part-prepaid) minimum fee. Fully prepaid discounts this; no sale, no fee raises it.
   var MIN_FEE = 3500, MIN_FEE_FULL_PREPAID = 2800, MIN_FEE_NSNF = 4000;
   // The marketing/upfront fee on the part-prepaid scale never falls below this (inc VAT) - it lands here exactly at the slider's far right, where rate reaches RATE_PART_MAX and nothing remains to split proportionally.
@@ -246,7 +246,10 @@
     splitEl.disabled = sliderDisabled;
     splitEl.style.opacity = sliderDisabled ? '0.4' : '1';
     splitEl.style.cursor = sliderDisabled ? 'default' : 'pointer';
-    splitEl.style.background = 'linear-gradient(to right,#F2B92B 0%,#F2B92B ' + splitEl.value + '%,#DFDEE8 ' + splitEl.value + '%,#DFDEE8 100%)';
+    // A thin blue marker at the very start of the track sets the Full Prepaid snap-point apart from the Part Prepaid scale that follows it.
+    var fullPrepaidMark = 3;
+    var goldEnd = Math.max(Number(splitEl.value), fullPrepaidMark);
+    splitEl.style.background = 'linear-gradient(to right,#3C9ACC 0%,#3C9ACC ' + fullPrepaidMark + '%,#F2B92B ' + fullPrepaidMark + '%,#F2B92B ' + goldEnd + '%,#DFDEE8 ' + goldEnd + '%,#DFDEE8 100%)';
   }
 
   priceEl.addEventListener('input', function () {
